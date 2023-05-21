@@ -3,6 +3,8 @@ const cloudinary=require("cloudinary")
 const catchAsyncErrors=require("../Middlewares/catchAsyncErrors")
 const ErrorHandler=require("../Utils/errorHandler");
 const sendToken=require("../Utils/jwtToken")
+
+
 exports.registeremployee=async(req,res,next)=>{
     const myCloud=await cloudinary.v2.uploader.upload(req.body.avatar,{
         folder:"avatars",
@@ -81,3 +83,19 @@ exports.getemployee=catchAsyncErrors(async(req,res,next)=>{
     user
   })
 })
+
+exports.getAllEmployees=async (req,res,next)=>{
+  const employees=employee.find();
+  if(employees){
+    res.status(200).json({
+      sucess:true,
+      employees
+    })
+  }
+  else{
+    res.staus(404).json({
+      success:false,
+      message:"no employee found"
+    })
+  }
+}

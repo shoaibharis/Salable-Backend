@@ -57,4 +57,79 @@ exports.logout=catchAsyncErrors(async(req,res,next)=>{
     })
   })
 
+// @desc      Get all organizations
+// @route     GET /api/organizations
+// @access    Public
+ exports.getOrganizations = async (req, res) => {
+    try {
+      const Organizations = await organization.find();
+      res.json(Organizations);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  };
 
+  // @desc      Get single organization
+// @route     GET /api/organizations/:id
+// @access    Public
+exports.getOrganizationById = async (req, res) => {
+  try {
+    const Organization = await organization.findById(req.params.id);
+    if (Organization) {
+      res.json(Organization);
+    } else {
+      res.status(404).json({ message: 'Organization not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+
+// @desc      Update an organization
+// @route     PUT /api/organizations/:id
+// @access    Private
+exports.updateOrganization = async (req, res) => {
+  try {
+    const { orgName,orgType,orgEmail,password,avatar} = req.body;
+
+    const Organization = await organization.findById(req.params.id);
+
+    if (Organization) {
+      Organization.orgName = orgName || Organization.orgName;
+      Organization.orgType = orgType || Organization.orgType;
+      Organization.orgEmail = orgEmail|| Organization.orgEmail;
+      Organization.password= password || Organization.password;
+      Organization.avatar=avatar || Organization.avatar;
+
+      const updatedOrganization = await organization.save();
+      res.json(updatedOrganization);
+    } else {
+      res.status(404).json({ message: 'Organization not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// @desc      Delete an organization
+// @route     DELETE /api/organizations/:id
+// @access    Private
+exports.deleteOrganization = async (req, res) => {
+  try {
+    const Organization = await organization.findById(req.params.id);
+
+    if (Organization) {
+      await Organization.remove();
+      res.json({ message: 'Organization removed' });
+    } else {
+      res.status(404).json({ message: 'Organization not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};

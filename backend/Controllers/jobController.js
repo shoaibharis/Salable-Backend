@@ -95,3 +95,49 @@ exports.enrollment=catchAsyncErrors( async (req,res,next)=>{
     })
 
 })
+
+exports.updateJob= async (req, res) => {
+    try {
+      const { title,
+        description,
+        type,
+        category,
+        hours,
+        stipend } = req.body;
+  
+      const Job = await job.findById(req.params.id);
+  
+      if (Job) {
+        Job.title = title || Job.title;
+        Job.description = description || Job.description;
+        Job.type = type||  Job.type;
+        Job.category = category ||  Job.category;
+        Job.hours = hours ||  Job.hours;
+        Job.stipend = stipend ||Job.stipend;
+  
+        const updatedJob = await Job.save();
+        res.json(updatedJob);
+      } else {
+        res.status(404).json({ message: 'Job not found' });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  };
+
+exports.deleteJob = async (req, res) => {
+    try {
+      const Job = await job.findById(req.params.id);
+  
+      if (Job) {
+        await Job.remove();
+        res.json({ message: 'Job removed' });
+      } else {
+        res.status(404).json({ message: 'Job not found' });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  };
