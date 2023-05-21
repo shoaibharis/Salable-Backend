@@ -99,3 +99,55 @@ exports.getAllEmployees=async (req,res,next)=>{
     })
   }
 }
+
+exports.updateEmployee=async(req,res,next)=>{
+
+ try{
+  if(req.body.avatar){
+  const myCloud=await cloudinary.v2.uploader.upload(req.body.avatar,{
+    folder:"avatars",
+    width:150,
+    crop:"scale"
+  })
+}
+const {firstName,lastName,email,password}=req.body
+const emp=await employee.findById(req.params.id);
+
+if(emp){
+  emp.firstName=firstName || emp.firstName;
+  emp.lastName=lastName || emp.lastName;
+  emp.email=email || emp.email;
+  emp.password=password ||emp.password;
+  emp.avatar={
+    public_id:myCloud.public_id,
+    url:myCloud.secure_url
+  } || emp.avatar
+
+  const updatedEmp=await emp.save();}
+
+  else{
+    res.status(404).json({ message: 'employee not found' });
+  }}
+  catch(error){
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+  }
+
+  exports.deleteEmployee=async(req,res,next)=>{
+    try{
+    const emp=await employee.findById(req.params.id);
+
+    if(emp){
+     await emp.remove();
+     res.status(200).json({message:"employee removed"})
+    }
+    else{
+      res.status(400).json({message:"employee not found"})
+    }}
+    catch(error){
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+
+  }
